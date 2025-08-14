@@ -10,7 +10,7 @@
     <h1><i>Как справиться с булимией</i></h1>
     <p style="font-size: 26px;">Симптомы голода: 
         <li><i>урчание в животе</i></li>
-        <li>ощущение пустоты в желудке</li>
+        <li><i>ощущение пустоты в желудке</i></li>
         <li>озабоченность едой</li>
         <li>плохая концентрация</li>
         <li>раздражительность, если приём пищи откладывается</li></p>
@@ -39,106 +39,99 @@
     </div>
 </body>
 <style>
-#rotate {
-  margin: 50px auto;
-  background: radial-gradient(#c24343, #fff);
-}
-.active {
-border-radius: 100%;
-}
+  #rotate {
+    margin: 50px auto;
+      background: radial-gradient(#c24343, #fff);
+    touch-action: none;
+    user-select: none;
+  }
+  .active {
+    border-radius: 100%;
+  }
 </style>
 
-<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<div id="rotate"></div>
 
 <script>
-(function() {
-  var init, rotate, start, stop,
-    active = false,
-    angle = 0,
-    rotation = 0,
-    startAngle = 0,
-    center = {
-      x: 0,
-      y: 0
-    },
-    R2D = 180 / Math.PI,
-    rot = document.getElementById('rotate');
+  (function() {
+    const rot = document.getElementById('rotate');
+    let angle = 0;
+    let startAngle = 0;
+    let isRotating = false;
+    let center = { x: 0, y: 0 };
 
-  init = function() {
+    // Функция для вычисления угла между центром элемента и точкой касания/клика
+    function getAngle(centerX, centerY, pointX, pointY) {
+      const dx = pointX - centerX;
+      const dy = pointY - centerY;
+      return Math.atan2(dy, dx) * (180 / Math.PI);
+    }
+
+    // Обработчик начала вращения
+    function startRotate(e) {
+      e.preventDefault();
+      isRotating = true;
+      
+      // Получаем координаты центра элемента
+      const rect = rot.getBoundingClientRect();
+      center.x = rect.left + rect.width / 2;
+      center.y = rect.top + rect.height / 2;
+      
+      // Получаем координаты начальной точки
+      const pointX = e.clientX || e.touches[0].clientX;
+      const pointY = e.clientY || e.touches[0].clientY;
+      
+      // Вычисляем начальный угол
+      startAngle = getAngle(center.x, center.y, pointX, pointY) - angle;
+      
+      // Добавляем класс active
+      rot.classList.add('active');
+    }
+
+    // Обработчик вращения
+    function doRotate(e) {
+      if (!isRotating) return;
+      e.preventDefault();
+      
+      // Получаем координаты текущей точки
+      const pointX = e.clientX || e.touches[0].clientX;
+      const pointY = e.clientY || e.touches[0].clientY;
+      
+      // Вычисляем новый угол
+      const newAngle = getAngle(center.x, center.y, pointX, pointY) - startAngle;
+      
+      // Применяем вращение
+      angle = newAngle;
+      rot.style.transform = `rotate(${angle}deg)`;
+    }
+
+    // Обработчик окончания вращения
+    function stopRotate(e) {
+      if (!isRotating) return;
+      e.preventDefault();
+      isRotating = false;
+      rot.classList.remove('active');
+      console.log('Final angle:', angle);
+    }
+
     // Добавляем обработчики для мыши
-    rot.addEventListener("mousedown", start, false);
-    $(document).bind('mousemove', function(event) {
-      if (active === true) {
-        event.preventDefault();
-        rotate(event);
-      }
-    });
-    $(document).bind('mouseup', function(event) {
-      event.preventDefault();
-      stop(event);
-    });
-    
+    rot.addEventListener('mousedown', startRotate);
+    document.addEventListener('mousemove', doRotate);
+    document.addEventListener('mouseup', stopRotate);
+
     // Добавляем обработчики для сенсорных устройств
-    rot.addEventListener("touchstart", handleTouchStart, false);
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd, false);
-  };
+    rot.addEventListener('touchstart', startRotate, { passive: false });
+    document.addEventListener('touchmove', doRotate, { passive: false });
+    document.addEventListener('touchend', stopRotate, { passive: false });
 
-  function handleTouchStart(e) {
-    if (e.touches.length === 1) {
-      e.preventDefault();
-      start(e.touches[0]);
-    }
-  }
-  
-  function handleTouchMove(e) {
-    if (active === true && e.touches.length === 1) {
-      e.preventDefault();
-      rotate(e.touches[0]);
-    }
-  }
-  
-  function handleTouchEnd(e) {
-    if (e.touches.length === 0) {
-      e.preventDefault();
-      stop();
-    }
-  }
+    // Предотвращаем стандартное поведение браузера для touch-событий
+    document.addEventListener('touchstart', (e) => {
+      if (e.target === rot) e.preventDefault();
+    }, { passive: false });
 
-  start = function(e) {
-    var bb = this.getBoundingClientRect(),
-      t = bb.top,
-      l = bb.left,
-      h = bb.height,
-      w = bb.width,
-      x, y;
-    center = {
-      x: l + (w / 2),
-      y: t + (h / 2)
-    };
-    x = e.clientX - center.x;
-    y = e.clientY - center.y;
-    startAngle = R2D * Math.atan2(y, x);
-    return active = true;
-  };
-
-  rotate = function(e) {
-    var x = e.clientX - center.x,
-      y = e.clientY - center.y,
-      d = R2D * Math.atan2(y, x);
-    rotation = d - startAngle;
-    return rot.style.transform = "rotate(" + (angle + rotation) + "deg)";
-  };
-
-  stop = function() {
-    angle += rotation;
-    alert(angle);
-    return active = false;
-  };
-
-  init();
-
-}).call(this);
+    document.addEventListener('touchmove', (e) => {
+      if (isRotating) e.preventDefault();
+    }, { passive: false });
+  })();
 </script>
-
 </html>
