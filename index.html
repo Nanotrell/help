@@ -64,14 +64,14 @@ border-radius: 100%;
     rot = document.getElementById('rotate');
 
   init = function() {
-    rot.addEventListener("mousedown", start, false);
-    $(document).bind('mousemove', function(event) {
+    rot.addEventListener("touchstart", start, false);
+    $(document).bind('touchmove', function(event) {
       if (active === true) {
         event.preventDefault();
         rotate(event);
       }
     });
-    $(document).bind('mouseup', function(event) {
+    $(document).bind('touchend', function(event) {
       event.preventDefault();
       stop(event);
     });
