@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="container">
+    <h1>Как справиться с булимией</h1>
+    <p style="font-size: 26px;">Симптомы голода: 
+        <li>урчание в животе</li>
+        <li>ощущение пустоты в желудке</li>
+        <li>озабоченность едой</li>
+        <li>плохая концентрация</li>
+        <li>раздражительность, если приём пищи откладывается</li></p>
+
+    <div class="play" draggable="true" id="rotate">
+        <div class="k1" style="transform: rotate(30deg);"></div>
+        <div class="k1" style="transform: rotate(60deg);"></div>
+        <div class="k1" style="transform: rotate(90deg);"></div>
+        <div class="k1" style="transform: rotate(120deg);"></div>
+        <div class="k1" style="transform: rotate(150deg);"></div>
+        <div class="k" style="transform: rotate(30deg);"></div>
+        <div class="k" style="transform: rotate(60deg);"></div>
+        <div class="k" style="transform: rotate(90deg);"></div>
+        <div class="k" style="transform: rotate(120deg);"></div>
+        <div class="k" style="transform: rotate(150deg);"></div>
+        <div class="k2" style="transform: rotate(30deg);"></div>
+        <div class="k2" style="transform: rotate(60deg);"></div>
+        <div class="k2" style="transform: rotate(90deg);"></div>
+        <div class="k2" style="transform: rotate(120deg);"></div>
+        <div class="k2" style="transform: rotate(150deg);"></div>
+        <div class="k3" style="transform: rotate(30deg);"></div>
+        <div class="k3" style="transform: rotate(60deg);"></div>
+        <div class="k3" style="transform: rotate(90deg);"></div>
+        <div class="k3" style="transform: rotate(120deg);"></div>
+        <div class="k3" style="transform: rotate(150deg);"></div>
+    </div>
+</body>
+<style>
+#rotate {
+  margin: 50px auto;
+  background: linear-gradient(0deg, red, rgb(128, 15, 0));
+}
+.active {
+border-radius: 100%;
+}
+</style>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+
+<script>
+(function() {
+  var init, rotate, start, stop,
+    active = false,
+    angle = 0,
+    rotation = 0,
+    startAngle = 0,
+    center = {
+      x: 0,
+      y: 0
+    },
+    R2D = 180 / Math.PI,
+    rot = document.getElementById('rotate');
+
+  init = function() {
+    rot.addEventListener("mousedown", start, false);
+    $(document).bind('mousemove', function(event) {
+      if (active === true) {
+        event.preventDefault();
+        rotate(event);
+      }
+    });
+    $(document).bind('mouseup', function(event) {
+      event.preventDefault();
+      stop(event);
+    });
+  };
+
+  start = function(e) {
+    e.preventDefault();
+    var bb = this.getBoundingClientRect(),
+      t = bb.top,
+      l = bb.left,
+      h = bb.height,
+      w = bb.width,
+      x, y;
+    center = {
+      x: l + (w / 2),
+      y: t + (h / 2)
+    };
+    x = e.clientX - center.x;
+    y = e.clientY - center.y;
+    startAngle = R2D * Math.atan2(y, x);
+    return active = true;
+  };
+
+  rotate = function(e) {
+    e.preventDefault();
+    var x = e.clientX - center.x,
+      y = e.clientY - center.y,
+      d = R2D * Math.atan2(y, x);
+    rotation = d - startAngle;
+    return rot.style.webkitTransform = "rotate(" + (angle + rotation) + "deg)";
+  };
+
+  stop = function() {
+    angle += rotation;
+    return active = false;
+  };
+
+  init();
+
+}).call(this);
+</script>
+
+</html>
