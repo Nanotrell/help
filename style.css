@@ -72,3 +72,6 @@ li {
 .k, .k1 {
     border-radius: 20px;
 }
+input:focus {
+  outline: none;
+}
